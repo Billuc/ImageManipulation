@@ -25,3 +25,6 @@ services:
       dockerfile: ./dockerfiles/init.dockerfile
     volumes:
       - ./app:/app:rw
+    ports:
+      - 3000:3000
+      - 4173:4173

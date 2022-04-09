@@ -1,0 +1,27 @@
+version: '3.4'
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: ./dockerfiles/app.dockerfile
+    volumes:
+      - ./app/src:/app/src:rw
+      - ./app/public:/app/public:rw
+      - ./app/static:/app/static:rw
+      - ./app/.svelte-kit:/app/.svelte-kit:rw
+      - ./app/tsconfig.json:/app/tsconfig.json:rw
+      - ./app/package.json:/app/package.json:rw
+      - ./app/package-lock.json:/app/package-lock.json:rw
+      - ./app/svelte.config.js:/app/svelte.config.js:rw
+      - ./app/playwright.config.js:/app/playwright.config.js:rw
+      - ./app/node_modules:/app/node_modules:rw
+    ports:
+      - 3000:3000
+
+  init:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/init.dockerfile
+    volumes:
+      - ./app:/app:rw

@@ -9,4 +9,4 @@ RUN npm install
 
 FROM base as svelte
 
-ENTRYPOINT [ "npm", "run", "dev" ]
+ENTRYPOINT [ "npm", "run", "dev", "--", "--host" ]

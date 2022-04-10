@@ -13,7 +13,14 @@
      * of JS in `.svelte` files.
      */
     "allowJs": true,
-    "checkJs": true
+    "checkJs": true,
+
+    "paths": {
+      "@lib/*": ["/src/lib"],
+      "@assets/*": ["/src/assets"],
+      "@model/*": ["/src/model"],
+      "@services/*": ["/src/services"] 
+    }
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
   "references": [{ "path": "./tsconfig.node.json" }]

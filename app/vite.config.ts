@@ -8,7 +8,9 @@ export default defineConfig(({ command, mode }) => {
   return { 
     resolve: { alias: {
         '@lib': '/src/lib',
-        '@assets': '/src/assets'
+        '@assets': '/src/assets',
+        '@services': '/src/services',
+        '@model': '/src/model'
       }
     },
     plugins: [

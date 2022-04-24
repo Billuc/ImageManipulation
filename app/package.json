@@ -12,11 +12,15 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.0-next.30",
     "@tsconfig/svelte": "^2.0.1",
+    "@types/lodash": "^4.14.182",
     "svelte": "^3.44.0",
     "svelte-check": "^2.2.7",
     "svelte-preprocess": "^4.9.8",
     "tslib": "^2.3.1",
     "typescript": "^4.5.4",
     "vite": "^2.9.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
   }
 }

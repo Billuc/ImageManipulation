@@ -42,7 +42,7 @@
     </div>
 
     <div class="upload-button" on:click={(_) => fileInput.click()}>
-        Upload image
+        <span>Upload image</span>
     </div>
     <input
         style="display: none;"
@@ -60,6 +60,7 @@
         align-items: center;
 
         max-width: 200px;
+        margin: 1em auto;
     }
 
     .image-display {
@@ -78,5 +79,24 @@
         max-height: inherit;
         width: auto;
         height: auto;
+    }
+
+    .upload-button {
+        padding: 0.5em;
+        margin: 0.5em;
+
+        border-radius: 2px;
+        background-color: black;
+        border: 2px solid rgb(34, 233, 34);
+        color: rgb(34, 233, 34);
+        
+        transform: skewX(345deg);
+        cursor: pointer;
+        box-shadow: 0px 0px 8px 4px rgba(34,233,34,1);
+    }
+
+    .upload-button > * {
+        display: inline-block;
+        transform: skewX(15deg);
     }
 </style>

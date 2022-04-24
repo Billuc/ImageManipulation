@@ -12,6 +12,8 @@ export class ImageManip {
         this.convertToPixels();
     }
 
+    // Getters / setters
+
     get imageData() {
         return this._imageData;
     }
@@ -29,14 +31,18 @@ export class ImageManip {
         return this.fakeImg.height;
     }
 
+    // Public methods
+
     public async getPixels() {
         await this.converting;
         return this._pixels;
     }
 
+    // Private methods
+
     private convertToPixels() {
         this.converting = new Promise((res, rej) => {
-            this.fakeImg.addEventListener("load", _ => { this.setPixels(), res() });
+            this.fakeImg.addEventListener("load", _ => { this.setPixels(); res(); });
             this.fakeImg.addEventListener("error", _ => rej());
             this.fakeImg.src = this._imageData;
         });

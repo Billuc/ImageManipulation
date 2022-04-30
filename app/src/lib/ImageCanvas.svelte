@@ -3,6 +3,7 @@
     import { Mode } from "@model/mode.model";
     import { TransformHelper } from "@model/transform.model";
     import { CharData } from "@model/chardata.model";
+    import { CANVAS_HEIGHT } from "@model/consts";
     import _ from "lodash";
 
     // Props
@@ -20,7 +21,9 @@
         try {
             const data = await transform.getImage(mode);
             applyImage(data);
-        } catch {}
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     $: modeChanged(mode);
@@ -28,7 +31,9 @@
         try {
             const data = await transform.getImage(mode);
             applyImage(data);
-        } catch {}
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     $: pixelsChanged(pixels);
@@ -46,15 +51,14 @@
     const applyImage = (data: CharData | ImageData) => {
         if (!canvas) return;
 
-        canvas.width = image.width;
-        canvas.height = image.height;
+        canvas.width = image.width * canvas.height / image.height;
 
         const context = canvas.getContext("2d");
 
         if (data instanceof CharData) {
             applyCharData(context, data);
         } else {
-            context.putImageData(data, 0, 0);
+            context.putImageData(data, 0, 0, 0, 0, canvas.width, canvas.height);
         }
     };
 
@@ -63,17 +67,15 @@
         data: CharData
     ) => {
         context.clearRect(0, 0, canvas.width, canvas.height);
-        
-        const letterSize = image.width / data.width;
-        context.font = letterSize + "px monospace";
+        context.font = pixels + "px monospace";
 
         for (let j = 0; j < data.height; j++) {
             for (let i = 0; i < data.width; i++) {
                 context.fillStyle = data.colors[j][i].toHex();
                 context.fillText(
                     data.data[j][i],
-                    i * letterSize + letterSize / 2,
-                    j * letterSize + letterSize / 2
+                    i * pixels + pixels / 2,
+                    j * pixels + pixels
                 );
             }
         }
@@ -81,14 +83,14 @@
 
     const applyPixels = (p: number) => {
         if (mode == Mode.Pixellized || mode == Mode.Ascii) {
-            transform.setPixelationSize(p);
+            transform.setPixelSize(p);
             transform
                 .getImage(mode)
                 .then((data: CharData | ImageData) => applyImage(data));
         }
     };
 
-    const debouncePixels = _.debounce(applyPixels, 300);
+    const debouncePixels = _.debounce(applyPixels, 500);
 </script>
 
-<canvas class="image-canvas" bind:this={canvas} />
+<canvas class="image-canvas" bind:this={canvas} height={CANVAS_HEIGHT} />

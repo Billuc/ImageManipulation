@@ -16,21 +16,32 @@
 <main>
   <header>Image Manipulation</header>
 
-  <ImageCanvas {image} {mode} {pixels} />
+  <div class="main">
+    <div class="left-column">
+      <ImageInput
+        {image}
+        preview={false}
+        on:imageloaded={(img) => (image = img.detail)}
+      />
 
-  <ImageInput
-    {image}
-    preview={false}
-    on:imageloaded={(img) => (image = img.detail)}
-  />
+      <TransformSelector
+        on:input={(m) => (mode = m.detail)}
+        on:change={(v) => (pixels = v.detail)}
+        {mode}
+        {pixels}
+        column
+      />
+    </div>
 
-  <TransformSelector on:input={(m) => (mode = m.detail)} on:change={(v) => (pixels = v.detail)} {mode} {pixels} />
+    <div class="content">
+      <ImageCanvas {image} {mode} {pixels} />
+    </div>
+  </div>
 </main>
 
 <style>
   :root {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, sans-serif;
 
     background-color: black;
   }
@@ -42,14 +53,37 @@
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
+    justify-content: stretch;
   }
 
   header {
     color: rgb(34, 233, 34);
     text-transform: uppercase;
     font-size: 2rem;
-    font-weight: 100;
     line-height: 1.1;
-    margin: 2rem auto;
+    margin: 1.5rem auto;
+    text-shadow: rgb(34, 233, 34) 2px 2px 4px;
+  }
+
+  .main {
+    display: flex;
+    flex-flow: row nowrap;
+    
+    width: 100%;
+  }
+
+  .left-column {
+    width: 250px;
+    max-width: 25%;
+    margin-right: 1em;
+    padding: 0.5em;
+    flex-shrink: 0;
+
+    box-shadow: 0 0 8px 4px rgb(34, 233, 34);
+  }
+
+  .content {
+    flex-grow: 1;
+    text-align: center;
   }
 </style>

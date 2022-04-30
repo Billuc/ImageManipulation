@@ -6,6 +6,7 @@
 
     export let mode: Mode;
     export let pixels: number;
+    export let column: boolean = false;
 
     // Data
 
@@ -23,16 +24,21 @@
     };
 </script>
 
-<div class="transform-selector">
-    {#each modes as [m, v]}
-        <button on:click={(_) => setMode(v)} class={v == mode ? "active" : ""}>
-            <span>{m}</span>
-        </button>
-    {/each}
+<div class="transform-selector" class:column>
+    <div class="transform-picker" class:column>
+        {#each modes as [m, v]}
+            <button
+                on:click={(_) => setMode(v)}
+                class={v == mode ? "active" : ""}
+            >
+                <span>{m}</span>
+            </button>
+        {/each}
+    </div>
 
     {#if mode == Mode.Pixellized || mode == Mode.Ascii}
-        <div class="transform-slider">
-            <span>Pixel number (width) : {pixels}</span>
+        <div class="transform-slider" class:column>
+            <span>Pixel size : {pixels}</span>
             <input
                 type="range"
                 min="1"
@@ -45,6 +51,21 @@
 </div>
 
 <style>
+    .transform-selector {
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: center;
+    }
+
+    .transform-picker {
+        display: flex;
+        flex-flow: row wrap;
+    }
+
+    .transform-picker.column {
+        flex-flow: column nowrap;
+    }
+
     button {
         padding: 0.5em;
         margin: 0.5em;
@@ -56,7 +77,7 @@
 
         transform: skewX(345deg);
         cursor: pointer;
-        box-shadow: 0px 0px 8px 4px rgba(34, 233, 34, 1);
+        box-shadow: 0px 0px 8px 4px #22e922;
     }
 
     button > * {
@@ -79,6 +100,11 @@
         margin: 0.5em;
 
         color: rgb(34, 233, 34);
+    }
+
+    .transform-slider.column {
+        flex-flow: column nowrap;
+        row-gap: 0.5em;
     }
 
     .transform-slider > input[type="range"] {

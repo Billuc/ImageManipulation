@@ -44,11 +44,17 @@ export class Color {
     set a(value: number) { this._a = value; }
 
     public toHex(): string {
-        return "#" + 
-            Math.floor(this._r * 255).toString(16) + 
-            Math.floor(this._g * 255).toString(16) + 
-            Math.floor(this._b * 255).toString(16) + 
-            Math.floor(this._a * 255).toString(16);
+        let rAsHex = Math.floor(this._r * 255).toString(16);
+        let gAsHex = Math.floor(this._g * 255).toString(16);
+        let bAsHex = Math.floor(this._b * 255).toString(16);
+        let aAsHex = Math.floor(this._a * 255).toString(16);
+
+        if (rAsHex.length == 1) rAsHex = "0" + rAsHex;
+        if (gAsHex.length == 1) gAsHex = "0" + gAsHex;
+        if (bAsHex.length == 1) bAsHex = "0" + bAsHex;
+        if (aAsHex.length == 1) aAsHex = "0" + aAsHex;
+
+        return "#" + rAsHex + gAsHex + bAsHex + aAsHex; 
     }
 
     // https://en.wikipedia.org/wiki/HSL_and_HSV#From_RGB

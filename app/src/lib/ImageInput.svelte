@@ -33,6 +33,10 @@
 </script>
 
 <div class="image-input">
+    <div class="upload-button" on:click={(_) => fileInput.click()}>
+        <span>Upload image</span>
+    </div>
+    
     <div class="image-display">
         {#if image && preview}
             <img src={image.imageData} alt="Couldn't load" />
@@ -41,9 +45,6 @@
         {/if}
     </div>
 
-    <div class="upload-button" on:click={(_) => fileInput.click()}>
-        <span>Upload image</span>
-    </div>
     <input
         style="display: none;"
         type="file"

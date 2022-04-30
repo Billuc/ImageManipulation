@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { CharData } from "./chardata.model";
 import { Color } from "./color.model";
 import type { ImageManip } from "./image.model";
@@ -11,7 +12,7 @@ export class TransformHelper {
     private readonly SHARPEN = [[0, -1, 0], [-1, 5, -1], [0, -1, 0]];
 
     private image: ImageManip;
-    private pixelationSize: number = 15;
+    private pixelSize: number = 15;
 
     constructor() { }
 
@@ -21,8 +22,8 @@ export class TransformHelper {
         this.image = image;
     }
 
-    setPixelationSize(pixels: number) {
-        this.pixelationSize = pixels;
+    setPixelSize(pixels: number) {
+        this.pixelSize = pixels;
     }
 
     async getImage(mode: Mode): Promise<CharData | ImageData> {
@@ -58,10 +59,10 @@ export class TransformHelper {
 
     private pixelate(pixels: Uint8ClampedArray): Uint8ClampedArray {
         let result: number[] = [];
-        let pixelColors: number[][][]; // pixelColors is an array of colors. Dimensions : (pixelationSize + 1) * (nbOfPixelsY + 1) * 4
+        let pixelColors: number[][][]; // pixelColors is an array of colors. Dimensions : (nbOfPixelsX + 1) * (nbOfPixelsY + 1) * 4
 
-        const pixelSize = Math.floor(this.image.width / this.pixelationSize);
-        const nbOfPixelsY = Math.floor(this.image.height / pixelSize);
+        const nbOfPixelsX = Math.floor(this.image.width / this.pixelSize);
+        const nbOfPixelsY = Math.floor(this.image.height / this.pixelSize);
 
         pixelColors = Array<number[][]>(nbOfPixelsY + 1); // Adding +1 for remainders
 
@@ -69,10 +70,10 @@ export class TransformHelper {
         for (let j = 0; j < this.image.height; j++) {
             for (let i = 0; i < this.image.width; i++) {
                 const pixel = this.positionToPixel(i, j);
-                const pixelX = Math.floor(i / pixelSize);
-                const pixelY = Math.floor(j / pixelSize);
+                const pixelX = Math.floor(i / this.pixelSize);
+                const pixelY = Math.floor(j / this.pixelSize);
 
-                if (!pixelColors[pixelY]) pixelColors[pixelY] = Array<number[]>(this.pixelationSize + 1);
+                if (!pixelColors[pixelY]) pixelColors[pixelY] = Array<number[]>(nbOfPixelsX + 1);
                 if (!pixelColors[pixelY][pixelX]) pixelColors[pixelY][pixelX] = [0, 0, 0, 0];
 
                 pixelColors[pixelY][pixelX][0] += pixels[pixel[0]];
@@ -85,13 +86,17 @@ export class TransformHelper {
         // Loop pixels to fill result
         for (let j = 0; j < this.image.height; j++) {
             for (let i = 0; i < this.image.width; i++) {
-                const pixelX = Math.floor(i / pixelSize);
-                const pixelY = Math.floor(j / pixelSize);
+                const pixelX = Math.floor(i / this.pixelSize);
+                const pixelY = Math.floor(j / this.pixelSize);
 
-                result.push(this.clamp(pixelColors[pixelY][pixelX][0] / (pixelSize * pixelSize), 0, 255));
-                result.push(this.clamp(pixelColors[pixelY][pixelX][1] / (pixelSize * pixelSize), 0, 255));
-                result.push(this.clamp(pixelColors[pixelY][pixelX][2] / (pixelSize * pixelSize), 0, 255));
-                result.push(this.clamp(pixelColors[pixelY][pixelX][3] / (pixelSize * pixelSize), 0, 255));
+                const scaleDownX = (pixelX == nbOfPixelsX) ? this.image.width - (nbOfPixelsX * this.pixelSize) : this.pixelSize;
+                const scaleDownY = (pixelY == nbOfPixelsY) ? this.image.height - (nbOfPixelsY * this.pixelSize) : this.pixelSize;
+                const scaleDown = scaleDownX * scaleDownY;
+
+                result.push(this.clamp(pixelColors[pixelY][pixelX][0] / scaleDown, 0, 255));
+                result.push(this.clamp(pixelColors[pixelY][pixelX][1] / scaleDown, 0, 255));
+                result.push(this.clamp(pixelColors[pixelY][pixelX][2] / scaleDown, 0, 255));
+                result.push(this.clamp(pixelColors[pixelY][pixelX][3] / scaleDown, 0, 255));
             }
         }
 
@@ -99,22 +104,22 @@ export class TransformHelper {
     }
 
     private toAscii(pixels: Uint8ClampedArray): CharData {
-        const pixelSize = Math.floor(this.image.width / this.pixelationSize);
-        const nbOfPixelsY = Math.floor(this.image.height / pixelSize);
+        const nbOfPixelsX = Math.floor(this.image.width / this.pixelSize);
+        const nbOfPixelsY = Math.floor(this.image.height / this.pixelSize);
 
-        var chardata = new CharData(this.pixelationSize, nbOfPixelsY);
+        var chardata = new CharData(nbOfPixelsX + 1, nbOfPixelsY + 1);
         
-        let pixelColors: number[][][]; // pixelColors is an array of colors. Dimensions : pixelationSize * nbOfPixelsY * 4
+        let pixelColors: number[][][]; // pixelColors is an array of colors. Dimensions : (nbOfPixelsX + 1) * (nbOfPixelsY + 1) * 4
         pixelColors = Array<number[][]>(nbOfPixelsY + 1);  // Adding +1 for remainders
 
         // Loop pixels to fill pixelColors
         for (let j = 0; j < this.image.height; j++) {
             for (let i = 0; i < this.image.width; i++) {
                 const pixel = this.positionToPixel(i, j);
-                const pixelX = Math.floor(i / pixelSize);
-                const pixelY = Math.floor(j / pixelSize);
+                const pixelX = Math.floor(i / this.pixelSize);
+                const pixelY = Math.floor(j / this.pixelSize);
 
-                if (!pixelColors[pixelY]) pixelColors[pixelY] = Array<number[]>(this.pixelationSize + 1);
+                if (!pixelColors[pixelY]) pixelColors[pixelY] = Array<number[]>(nbOfPixelsX + 1);
                 if (!pixelColors[pixelY][pixelX]) pixelColors[pixelY][pixelX] = [0, 0, 0, 0];
 
                 pixelColors[pixelY][pixelX][0] += pixels[pixel[0]];
@@ -123,21 +128,33 @@ export class TransformHelper {
                 pixelColors[pixelY][pixelX][3] += pixels[pixel[3]];
             }
         }
-        
+
         for (let pixelJ = 0; pixelJ < chardata.height; pixelJ++) {
             for (let pixelI = 0; pixelI < chardata.width; pixelI++) {
-                const pixel = pixelColors[pixelJ][pixelI];
-                const scaleDown = 1 / (pixelSize * pixelSize * 255);
+                if (!pixelColors[pixelJ]) {
+                    chardata.height = pixelJ;
+                    continue;
+                } 
+                if (!pixelColors[pixelJ][pixelI]) {
+                    chardata.width = pixelI;
+                    continue;
+                }
 
-                if (!chardata.data[pixelJ]) chardata.data[pixelJ] = Array<string>(this.pixelationSize);
-                if (!chardata.colors[pixelJ]) chardata.colors[pixelJ] = Array<Color>(this.pixelationSize);
+                const pixel = pixelColors[pixelJ][pixelI];
+                
+                const scaleDownX = (pixelI == nbOfPixelsX) ? this.image.width - (nbOfPixelsX * this.pixelSize) : this.pixelSize;
+                const scaleDownY = (pixelJ == nbOfPixelsY) ? this.image.height - (nbOfPixelsY * this.pixelSize) : this.pixelSize;
+                const scaleDown = 255 * scaleDownX * scaleDownY;
+
+                if (!chardata.data[pixelJ]) chardata.data[pixelJ] = Array<string>(nbOfPixelsX + 1);
+                if (!chardata.colors[pixelJ]) chardata.colors[pixelJ] = Array<Color>(nbOfPixelsX + 1);
 
                 const color = new Color(
                     "rgb",
-                    this.clamp(pixel[0] * scaleDown, 0, 1),
-                    this.clamp(pixel[1] * scaleDown, 0, 1),
-                    this.clamp(pixel[2] * scaleDown, 0, 1),
-                    this.clamp(pixel[3] * scaleDown, 0, 1)
+                    this.clamp(pixel[0] / scaleDown, 0, 1),
+                    this.clamp(pixel[1] / scaleDown, 0, 1),
+                    this.clamp(pixel[2] / scaleDown, 0, 1),
+                    this.clamp(pixel[3] / scaleDown, 0, 1)
                 );
 
                 const colorDensity = color.v * color.a;

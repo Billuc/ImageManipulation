@@ -1,3 +1,5 @@
+import { CANVAS_HEIGHT } from "./consts";
+
 export class ImageManip {
     private _imageData: string;
     private _pixels: Uint8ClampedArray;
@@ -10,6 +12,7 @@ export class ImageManip {
     constructor(data: string)   {
         this._imageData = data;
         this.convertToPixels();
+        this.fakeCanvas.height = CANVAS_HEIGHT;
     }
 
     // Getters / setters
@@ -24,11 +27,11 @@ export class ImageManip {
     }
 
     get width() {
-        return this.fakeImg.width;
+        return this.fakeCanvas.width;
     }
 
     get height() {
-        return this.fakeImg.height;
+        return this.fakeCanvas.height;
     }
 
     // Public methods
@@ -49,9 +52,8 @@ export class ImageManip {
     }
 
     private setPixels() {
-        this.fakeCanvas.width = this.fakeImg.width;
-        this.fakeCanvas.height = this.fakeImg.height;
-        this.context.drawImage(this.fakeImg, 0, 0);
+        this.fakeCanvas.width = this.fakeImg.width * this.fakeCanvas.height / this.fakeImg.height;
+        this.context.drawImage(this.fakeImg, 0, 0, this.fakeCanvas.width, this.fakeCanvas.height);
         this._pixels = this.context.getImageData(0, 0, this.fakeCanvas.width, this.fakeCanvas.height).data;
     }
 }

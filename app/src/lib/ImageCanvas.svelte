@@ -82,7 +82,7 @@
     };
 
     const applyPixels = (p: number) => {
-        if (mode == Mode.Pixellized || mode == Mode.Ascii) {
+        if (mode == Mode.Pixelate || mode == Mode.Ascii) {
             transform.setPixelSize(p);
             transform
                 .getImage(mode)

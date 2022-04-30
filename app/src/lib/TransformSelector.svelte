@@ -36,7 +36,7 @@
         {/each}
     </div>
 
-    {#if mode == Mode.Pixellized || mode == Mode.Ascii}
+    {#if mode == Mode.Pixelate || mode == Mode.Ascii}
         <div class="transform-slider" class:column>
             <span>Pixel size : {pixels}</span>
             <input

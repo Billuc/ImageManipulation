@@ -44,7 +44,7 @@ export class TransformHelper {
 
     private transformPixels(pixels: Uint8ClampedArray, mode: Mode): Uint8ClampedArray {
         switch (mode) {
-            case Mode.Pixellized:
+            case Mode.Pixelate:
                 return this.pixelate(pixels);
             case Mode.Border:
                 return this.applyFilter(pixels, this.EDGE_DETECTION);

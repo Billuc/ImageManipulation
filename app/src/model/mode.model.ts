@@ -1,6 +1,6 @@
 export enum Mode {
     Default,
-    Pixellized,
+    Pixelate,
     Ascii,
     Border,
     Blur,

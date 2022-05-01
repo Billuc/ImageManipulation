@@ -9,6 +9,12 @@ I built it using Svelte to discover and train with this framework. I also used V
 
 ## Implemented filters
 
+### Greyscale
+
+We get a greyscale effect by removing the saturation component of each pixel.
+
+![Greyscale Image](./images/greyscale_image.png)
+
 ### Pixelate
 
 The image is pixelated by averaging the color between pixels.  
@@ -45,6 +51,13 @@ The sharpen filter is also applied using a convolution product.
 The matrix used is 3*3 in size, thus explaining why the effect is very subtle.
 
 ![Sharpened Image](./images/sharpened_image.png)
+
+### Invert
+
+We get an invert effect by applying the (1-x) function the RGB component of each pixel.  
+This could also be done by applying the same function to the Lightness component of the color and rotating the Hue by 180°.
+
+![Inverted Image](./images//inverted_image.png)
 
 ## Commands
 

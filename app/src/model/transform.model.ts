@@ -46,12 +46,16 @@ export class TransformHelper {
         switch (mode) {
             case Mode.Pixelate:
                 return this.pixelate(pixels);
+            case Mode.Greyscale:
+                return this.toGreyscale(pixels);
             case Mode.Border:
                 return this.applyFilter(pixels, this.EDGE_DETECTION);
             case Mode.Blur:
                 return this.applyFilter(pixels, this.BLUR);
             case Mode.Sharpen:
                 return this.applyFilter(pixels, this.SHARPEN);
+            case Mode.Invert:
+                return this.invert(pixels);
             default:
                 return pixels;
         }
@@ -108,7 +112,7 @@ export class TransformHelper {
         const nbOfPixelsY = Math.floor(this.image.height / this.pixelSize);
 
         var chardata = new CharData(nbOfPixelsX + 1, nbOfPixelsY + 1);
-        
+
         let pixelColors: number[][][]; // pixelColors is an array of colors. Dimensions : (nbOfPixelsX + 1) * (nbOfPixelsY + 1) * 4
         pixelColors = Array<number[][]>(nbOfPixelsY + 1);  // Adding +1 for remainders
 
@@ -134,14 +138,14 @@ export class TransformHelper {
                 if (!pixelColors[pixelJ]) {
                     chardata.height = pixelJ;
                     continue;
-                } 
+                }
                 if (!pixelColors[pixelJ][pixelI]) {
                     chardata.width = pixelI;
                     continue;
                 }
 
                 const pixel = pixelColors[pixelJ][pixelI];
-                
+
                 const scaleDownX = (pixelI == nbOfPixelsX) ? this.image.width - (nbOfPixelsX * this.pixelSize) : this.pixelSize;
                 const scaleDownY = (pixelJ == nbOfPixelsY) ? this.image.height - (nbOfPixelsY * this.pixelSize) : this.pixelSize;
                 const scaleDown = 255 * scaleDownX * scaleDownY;
@@ -160,7 +164,7 @@ export class TransformHelper {
                 const colorDensity = color.v * color.a;
                 chardata.data[pixelJ][pixelI] = this.densityToChar(colorDensity);
 
-                color.v = 1;
+                color.s = 0;
                 color.a = 1;
 
                 chardata.colors[pixelJ][pixelI] = color;
@@ -168,6 +172,60 @@ export class TransformHelper {
         }
 
         return chardata;
+    }
+
+    private toGreyscale(pixels: Uint8ClampedArray): Uint8ClampedArray {
+        let result: number[] = [];
+
+        for (let j = 0; j < this.image.height; j++) {
+            for (let i = 0; i < this.image.width; i++) {
+                const pixel = this.positionToPixel(i, j);
+                const pixelColor = new Color(
+                    "rgb", 
+                    pixels[pixel[0]] / 255, 
+                    pixels[pixel[1]] / 255, 
+                    pixels[pixel[2]] / 255, 
+                    pixels[pixel[3]] / 255
+                );
+
+                pixelColor.s = 0;
+                
+                result.push(this.clamp(255 * pixelColor.r, 0, 255));
+                result.push(this.clamp(255 * pixelColor.g, 0, 255));
+                result.push(this.clamp(255 * pixelColor.b, 0, 255));
+                result.push(this.clamp(255 * pixelColor.a, 0, 255));
+            }
+        }
+
+        return new Uint8ClampedArray(result);
+    }
+
+    private invert(pixels: Uint8ClampedArray): Uint8ClampedArray {
+        let result: number[] = [];
+
+        for (let j = 0; j < this.image.height; j++) {
+            for (let i = 0; i < this.image.width; i++) {
+                const pixel = this.positionToPixel(i, j);
+                const pixelColor = new Color(
+                    "rgb", 
+                    pixels[pixel[0]] / 255, 
+                    pixels[pixel[1]] / 255, 
+                    pixels[pixel[2]] / 255, 
+                    pixels[pixel[3]] / 255
+                );
+
+                pixelColor.r = 1 - pixelColor.r;
+                pixelColor.g = 1 - pixelColor.g;
+                pixelColor.b = 1 - pixelColor.b;
+                
+                result.push(this.clamp(255 * pixelColor.r, 0, 255));
+                result.push(this.clamp(255 * pixelColor.g, 0, 255));
+                result.push(this.clamp(255 * pixelColor.b, 0, 255));
+                result.push(this.clamp(255 * pixelColor.a, 0, 255));
+            }
+        }
+
+        return new Uint8ClampedArray(result);
     }
 
     // Inspired by https://github.com/jace21/Image-Filters/blob/master/filters.java
